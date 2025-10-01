@@ -1,0 +1,213 @@
+/* =============================================================== */
+/* --- 1. THEME & COLOR SETUP (CSS VARIABLES) --- */
+/* =============================================================== */
+:root {
+  --bg-gradient: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+  --card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #e6eef6;
+  --text-muted: #9aa6b2;
+  --accent-color: #38bdf8;
+  --accent-text: #042028;
+}
+
+body.day {
+  --bg-gradient: linear-gradient(to top, #6dd5ed, #2193b0);
+  --card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --text-primary: #1f2937;
+  --text-muted: #4b5563;
+  --accent-color: #0077b6;
+  --accent-text: #ffffff;
+}
+
+body.rain {
+  --bg-gradient: linear-gradient(to top, #3a5371, #6b7d94);
+  --card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --text-primary: #e5e7eb;
+  --text-muted: #a0a7b1;
+  --accent-color: #8cb2d3;
+  --accent-text: #0a141d;
+}
+
+/* =============================================================== */
+/* --- 2. BASE & LAYOUT STYLES --- */
+/* =============================================================== */
+* { box-sizing: border-box; }
+html, body { height: 110%; }
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding-bottom: 40px;
+  transition: background 0.8s ease;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body.rain::before {
+  content: ''; position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-image: linear-gradient(transparent, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  background-size: 2px 20px;
+  animation: rain-fall 0.6s linear infinite;
+  z-index: -1; opacity: 0.3;
+}
+@keyframes rain-fall {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 20% 100%; }
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 24px; padding: 24px;
+  max-width: 1200px; margin: 24px auto;
+  align-items: start;
+}
+.left, .right { display: flex; flex-direction: column; gap: 20px; }
+
+.card {
+  background: var(--card-bg);
+  border-radius: 16px; padding: 24px;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px rgba(2, 6, 23, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background 0.5s ease, border 0.5s ease;
+}
+
+/* =============================================================== */
+/* --- 3. WEATHER ANIMATION STYLES --- */
+/* =============================================================== */
+.weather-animation {
+  width: 60px; height: 60px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.cloud {
+  width: 45px; height: 12px; background: #f1f1f1;
+  border-radius: 10px; position: absolute; z-index: 10;
+  top: 40%; left: 25%; animation: cloud-move 12s ease-in-out infinite alternate;
+}
+.cloud::before, .cloud::after { content: ''; position: absolute; background: #f1f1f1; border-radius: 50%; }
+.cloud::before { width: 20px; height: 20px; top: -10px; left: 8px; }
+.cloud::after { width: 30px; height: 30px; top: -15px; right: 5px; }
+.cloud:nth-child(2) { top: 60%; left: 60%; transform: scale(0.8); background: #ddd; animation-duration: 15s; }
+.sun {
+  width: 35px; height: 35px; background: #FFD700;
+  border-radius: 50%; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%); box-shadow: 0 0 20px #FFD700;
+  animation: spin 15s linear infinite; z-index: 5;
+}
+.moon {
+  width: 30px; height: 30px; background: transparent;
+  border-radius: 50%; box-shadow: -6px 4px 0 0 #f1f1f1;
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg); z-index: 5;
+}
+.rain-drop {
+  position: absolute; bottom: 100%; width: 2px; height: 10px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.4));
+  border-radius: 2px; animation: drop 0.8s linear infinite;
+}
+.snow-flake {
+  position: absolute; width: 3px; height: 3px;
+  background: white; border-radius: 50%;
+  opacity: 0.8; animation: fall 10s linear infinite;
+}
+.wind-line {
+  position: absolute; height: 2px; width: 20px;
+  background: rgba(255, 255, 255, 0.3); border-radius: 2px;
+  opacity: 0; animation: wind-blow 3s ease-in-out infinite;
+}
+@keyframes fall { 0% { transform: translateY(-10px) translateX(0px); opacity: 1; } 100% { transform: translateY(70px) translateX(20px); opacity: 0; } }
+@keyframes wind-blow { 0% { transform: translateX(-30px); opacity: 0; } 20%, 70% { opacity: 1; } 100% { transform: translateX(60px); opacity: 0; } }
+@keyframes cloud-move { from { transform: translateX(-10%); } to { transform: translateX(10%); } }
+@keyframes spin { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+@keyframes drop { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(60px); opacity: 0; } }
+
+/* =============================================================== */
+/* --- 4. COMPONENT STYLES --- */
+/* =============================================================== */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 12px 24px; backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); background: var(--card-bg);
+  border-bottom: 1px solid var(--glass-border);
+}
+.brand { font-weight: 700; color: var(--accent-color); letter-spacing: 0.6px; }
+.controls { display: flex; align-items: center; gap: 8px; }
+.controls input {
+  padding: 8px 12px; border-radius: 8px; border: none; background: var(--glass-border); color: var(--text-primary);
+  outline: none; min-width: 220px;
+}
+.controls input::placeholder { color: var(--text-muted); }
+.controls button {
+  padding: 8px 16px; border-radius: 8px; border: none; background: var(--accent-color); color: var(--accent-text);
+  font-weight: 600; cursor: pointer; transition: transform 0.2s ease;
+}
+.controls button:hover { transform: scale(1.05); }
+.controls #locBtn { background: transparent; color: var(--text-muted); font-size: 18px; padding: 6px 10px; }
+.weather-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.weather-header h1 { font-size: 20px; margin: 0; color: var(--text-primary); }
+.weather-header p { color: var(--text-muted); margin: 4px 0 0; font-size: 13px; }
+.temp-block { display: flex; align-items: center; gap: 10px; }
+#temp { font-size: 48px; font-weight: 700; color: var(--text-primary); }
+.weather-main { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 24px; }
+.stat { background: var(--glass-border); padding: 12px; border-radius: 8px; text-align: center; }
+.stat .label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+.extra { display: flex; gap: 12px; justify-content: space-between; margin-top: 20px; color: var(--text-muted); font-size: 13px; }
+.advice { margin-top: 20px; padding: 12px; border-radius: 8px; background: linear-gradient(90deg, rgba(56,189,248,0.1), rgba(99,102,241,0.05)); color: var(--text-primary); }
+.forecast-list { display: flex; gap: 10px; overflow-x: auto; padding: 6px; }
+.fc-item { min-width: 110px; padding: 10px; border-radius: 8px; background: var(--glass-border); text-align: center; }
+.fc-item .time { font-size: 13px; color: var(--text-muted); }
+.fc-item .t { font-weight: 700; margin: 6px 0; }
+
+/* === CHATBOX SCROLLING FIX STARTS HERE === */
+.chat-window {
+  height: 320px; /* This gives the chat a fixed height */
+  overflow-y: auto; /* This makes it scroll when content overflows */
+  display: flex;
+  flex-direction: column;
+  background: var(--glass-border);
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+/* === END OF CHATBOX FIX === */
+
+.bot-msg, .user-msg { padding: 10px; border-radius: 10px; margin: 6px 0; max-width: 85%; line-height: 1.5; }
+.bot-msg { background: rgba(255, 255, 255, 0.05); align-self: flex-start; }
+.user-msg { background: rgba(56, 189, 248, 0.15); align-self: flex-end; }
+.chat-controls { display: flex; gap: 8px; margin-top: 8px; }
+.chat-controls input { flex: 1; padding: 8px; border-radius: 8px; border: none; background: var(--glass-border); color: var(--text-primary); }
+.chat-controls button { padding: 8px 12px; border-radius: 8px; border: none; background: var(--accent-color); color: var(--accent-text); }
+.aqi-display { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+.aqi-value { font-size: 26px; font-weight: 700; padding: 5px 15px; border-radius: 8px; }
+.aqi-rating { font-size: 18px; font-weight: 600; }
+.aqi-1 { background-color: #4CAF50; color: white; }
+.aqi-2 { background-color: #FFEB3B; color: #333; }
+.aqi-3 { background-color: #FF9800; color: white; }
+.aqi-4 { background-color: #f44336; color: white; }
+.aqi-5 { background-color: #9C27B0; color: white; }
+
+/* =============================================================== */
+/* --- 5. RESPONSIVE MEDIA QUERIES --- */
+/* =============================================================== */
+@media (max-width: 1000px) { .container { grid-template-columns: 1fr 320px; padding: 16px; } }
+@media (max-width: 820px) {
+  .container { grid-template-columns: 1fr; padding: 12px; }
+  .right { order: 2; }
+  .chat-window { height: 350px; }
+  .left { order: 1; }
+  .controls input { min-width: 120px; }
+  .weather-main { grid-template-columns: repeat(2, 1fr); }
+}
